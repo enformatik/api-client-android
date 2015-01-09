@@ -12,5 +12,5 @@ A sample Android app that calls the Google Genomics API.
   drawer-based layout which lists datasets and jobs. 
 
 
-Note: this is just a sample app, so it's not very feature rich - contributions welcome!
+Note: this is just a sample app, so it's not very feature rich - [contributions welcome](CONTRIBUTING.rst)!
 
