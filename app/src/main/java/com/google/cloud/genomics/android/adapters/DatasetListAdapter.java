@@ -28,6 +28,7 @@ import com.google.api.services.genomics.model.ListDatasetsResponse;
 import com.google.cloud.genomics.android.CredentialActivity;
 import com.google.cloud.genomics.android.GenomicsTask;
 import com.google.cloud.genomics.android.R;
+import com.google.common.base.Strings;
 
 import java.io.IOException;
 
@@ -37,9 +38,11 @@ public class DatasetListAdapter extends ArrayAdapter<Dataset> {
   private LayoutInflater layoutInflater;
 
   public class GetDatasets extends GenomicsTask {
+    private String projectId;
 
-    public GetDatasets(CredentialActivity activity) {
-      super(activity);
+    public GetDatasets(CredentialActivity activity, String projectId) {
+        super(activity);
+        this.projectId = projectId;
     }
 
     @Override
@@ -48,6 +51,7 @@ public class DatasetListAdapter extends ArrayAdapter<Dataset> {
       String pageToken = null;
       do {
         final ListDatasetsResponse response = client.datasets().list()
+            .setProjectId(projectId)
             .setFields(DATASET_FIELDS)
             .setPageToken(pageToken).execute();
 
@@ -59,7 +63,7 @@ public class DatasetListAdapter extends ArrayAdapter<Dataset> {
         });
 
         pageToken = response.getNextPageToken();
-      } while (pageToken != null);
+      } while (!Strings.isNullOrEmpty(pageToken));
     }
   }
 
@@ -68,12 +72,12 @@ public class DatasetListAdapter extends ArrayAdapter<Dataset> {
     TextView subtitle;
   }
 
-  public DatasetListAdapter(CredentialActivity activity) {
+  public DatasetListAdapter(CredentialActivity activity, String projectId) {
     super(activity, android.R.layout.simple_list_item_1);
     layoutInflater = (LayoutInflater) getContext().getSystemService(
         Context.LAYOUT_INFLATER_SERVICE);
 
-    new GetDatasets(activity).execute();
+    new GetDatasets(activity, projectId).execute();
   }
 
   @Override

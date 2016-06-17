@@ -30,21 +30,14 @@ public class JobListFragment extends ListFragment {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    String projectString = SettingsActivity.getProjectNumber(getActivity());
-    if (projectString == null) {
-      Toast.makeText(getActivity(), "Set your project number in order to display Job status",
+    String projectId = SettingsActivity.getProjectId(getActivity());
+    if (projectId == null) {
+      Toast.makeText(getActivity(), "Set your project id in order to display operation status",
           Toast.LENGTH_LONG).show();
       launchSettings();
 
     } else {
-      try {
-        Long projectNumber = Long.valueOf(projectString);
-        setListAdapter(new JobListAdapter((CredentialActivity) getActivity(), projectNumber));
-      } catch (NumberFormatException e) {
-        Toast.makeText(getActivity(), "Your project number isn't valid",
-            Toast.LENGTH_SHORT).show();
-        launchSettings();
-      }
+      setListAdapter(new JobListAdapter((CredentialActivity) getActivity(), projectId));
     }
   }
 
@@ -52,9 +45,10 @@ public class JobListFragment extends ListFragment {
     startActivity(new Intent(getActivity(), SettingsActivity.class));
   }
 
+
   @Override
   public void onAttach(Activity activity) {
     super.onAttach(activity);
-    activity.setTitle(R.string.job_section_title);
+    activity.setTitle(R.string.operation_section_title);
   }
 }

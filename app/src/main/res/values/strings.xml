@@ -15,7 +15,7 @@ limitations under the License.
 
   <string name="app_name">Google Genomics</string>
   <string name="dataset_section_title">Datasets</string>
-  <string name="job_section_title">Jobs</string>
+  <string name="operation_section_title">Operations</string>
   <string name="navigation_drawer_open">Open navigation drawer</string>
   <string name="navigation_drawer_close">Close navigation drawer</string>
   <string name="action_settings">Settings</string>
@@ -23,7 +23,7 @@ limitations under the License.
   <string name="title_activity_dataset">Dataset</string>
   <string name="title_activity_settings">Settings</string>
 
-  <string name="project_number_display_name">Google Developers Console Project Number</string>
+  <string name="project_id_display_name">Cloud Console Project Id</string>
   <string name="account_name_display_name">Account</string>
 
   <string name="loading">Loading…</string>
