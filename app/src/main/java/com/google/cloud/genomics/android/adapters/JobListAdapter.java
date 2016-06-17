@@ -23,13 +23,12 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.google.api.services.genomics.Genomics;
-import com.google.api.services.genomics.model.Job;
-import com.google.api.services.genomics.model.JobRequest;
-import com.google.api.services.genomics.model.SearchJobsRequest;
-import com.google.api.services.genomics.model.SearchJobsResponse;
+import com.google.api.services.genomics.model.Operation;
+import com.google.api.services.genomics.model.ListOperationsResponse;
 import com.google.cloud.genomics.android.CredentialActivity;
 import com.google.cloud.genomics.android.GenomicsTask;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 import java.io.IOException;
@@ -37,8 +36,9 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Map;
 
-public class JobListAdapter extends ArrayAdapter<Job> {
-  private static final String JOB_FIELDS = "jobs(request,created)";
+public class JobListAdapter extends ArrayAdapter<Operation> {
+  private static final String OPERATIONS_FIELDS = "operations(done,name,response)";
+  private static final int PAGE_SIZE = 10;
 
   private static Map<String, String> JOB_TYPES = Maps.newHashMap();
   static {
@@ -50,12 +50,12 @@ public class JobListAdapter extends ArrayAdapter<Job> {
 
   private LayoutInflater layoutInflater;
 
-  public class GetJobs extends GenomicsTask {
-    private Long projectNumber;
+  public class GetOperations extends GenomicsTask {
+    private String projectId;
 
-    public GetJobs(CredentialActivity activity, Long projectNumber) {
+    public GetOperations(CredentialActivity activity, String projectId) {
       super(activity);
-      this.projectNumber = projectNumber;
+      this.projectId = projectId;
     }
 
     @Override
@@ -63,20 +63,23 @@ public class JobListAdapter extends ArrayAdapter<Job> {
       // TODO: Use paginator
       String pageToken = null;
       do {
-        final SearchJobsResponse response = client.jobs().search(
-            new SearchJobsRequest().setProjectNumber(projectNumber).setPageToken(pageToken))
-            .setFields(JOB_FIELDS)
-            .execute();
+        final ListOperationsResponse response = client.operations().list("operations")
+          .setName("operations")
+          .setFilter("projectId=" + projectId)
+          .setPageToken(pageToken)
+          .setFields(OPERATIONS_FIELDS)
+          .setPageSize(PAGE_SIZE)
+          .execute();
 
         activity.runOnUiThread(new Runnable() {
           @Override
           public void run() {
-            addAll(response.getJobs());
+            addAll(response.getOperations());
           }
         });
 
         pageToken = response.getNextPageToken();
-      } while (pageToken != null);
+      } while (!Strings.isNullOrEmpty(pageToken));
     }
   }
 
@@ -85,11 +88,11 @@ public class JobListAdapter extends ArrayAdapter<Job> {
     TextView subtitle;
   }
 
-  public JobListAdapter(CredentialActivity activity, Long projectNumber) {
+  public JobListAdapter(CredentialActivity activity, String projectId) {
     super(activity, android.R.layout.simple_list_item_1);
     layoutInflater = (LayoutInflater) activity.getSystemService(
         Context.LAYOUT_INFLATER_SERVICE);
-    new GetJobs(activity, projectNumber).execute();
+    new GetOperations(activity, projectId).execute();
   }
 
   @Override
@@ -110,32 +113,9 @@ public class JobListAdapter extends ArrayAdapter<Job> {
     // TODO: Allow cancellation
     // TODO: Allow retrying
 
-    Job job = getItem(position);
-    holder.title.setText(getJobDescription(job));
-    holder.subtitle.setText(getCreatedDate(job));
+    Operation operation = getItem(position);
+    holder.title.setText(operation.getName());
+    holder.subtitle.setText("Done: " + operation.getDone().toString());
     return convertView;
-  }
-
-  private String getCreatedDate(Job job) {
-    Date date = new Date(job.getCreated());
-    DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(getContext());
-    return dateFormat.format(date);
-  }
-
-  private String getJobDescription(Job job) {
-    JobRequest request = job.getRequest();
-    if (request == null) {
-      return "Unknown job";
-    }
-
-    String requestType = request.getType();
-    if (JOB_TYPES.containsKey(requestType)) {
-      requestType = JOB_TYPES.get(request.getType());
-    }
-
-    String source = Joiner.on(',').join(request.getSource());
-    String destination = Joiner.on(',').join(request.getDestination());
-
-    return requestType + " from " + source + " to " + destination;
   }
 }

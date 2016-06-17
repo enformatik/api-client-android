@@ -22,19 +22,29 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.api.services.genomics.model.Dataset;
 import com.google.cloud.genomics.android.CredentialActivity;
 import com.google.cloud.genomics.android.DatasetActivity;
 import com.google.cloud.genomics.android.R;
+import com.google.cloud.genomics.android.SettingsActivity;
 import com.google.cloud.genomics.android.adapters.DatasetListAdapter;
+import com.google.cloud.genomics.android.adapters.JobListAdapter;
 
 public class DatasetListFragment extends ListFragment {
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setListAdapter(new DatasetListAdapter((CredentialActivity) getActivity()));
+    String projectId = SettingsActivity.getProjectId(getActivity());
+    if (projectId == null) {
+      Toast.makeText(getActivity(), "Set your project id in order to display datasets",
+              Toast.LENGTH_LONG).show();
+      launchSettings();
+    } else {
+      setListAdapter(new DatasetListAdapter((CredentialActivity) getActivity(), projectId));
+    }
   }
 
   @Override
@@ -48,6 +58,10 @@ public class DatasetListFragment extends ListFragment {
     ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(getActivity(),
         view, getString(R.string.main_transition_name));
     startActivity(intent, options.toBundle());
+  }
+
+  private void launchSettings() {
+    startActivity(new Intent(getActivity(), SettingsActivity.class));
   }
 
   @Override

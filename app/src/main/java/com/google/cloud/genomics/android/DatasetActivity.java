@@ -71,7 +71,7 @@ public class DatasetActivity extends CredentialActivity {
         @Override
         public void run() {
           setTitle(dataset.getName());
-          projectView.setText("Project: " + dataset.getProjectNumber());
+          projectView.setText("Project: " + dataset.getProjectId());
         }
       });
     }

@@ -13,9 +13,9 @@ limitations under the License.
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
   <EditTextPreference
-      android:key="project_number"
-      android:title="@string/project_number_display_name"
-      android:inputType="number"
+      android:key="project_id"
+      android:title="@string/project_id_display_name"
+      android:inputType="text"
       android:singleLine="true" />
 
   <Preference

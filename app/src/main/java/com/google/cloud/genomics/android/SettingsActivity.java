@@ -28,11 +28,10 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.services.genomics.GenomicsScopes;
 
 import java.util.Collections;
-
 public class SettingsActivity extends Activity {
 
   private static final String PREF_ACCOUNT_NAME = "account_name";
-  private static final String PREF_PROJECT_NUMBER = "project_number";
+  private static final String PREF_PROJECT_ID = "project_id";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +66,8 @@ public class SettingsActivity extends Activity {
       super.onCreate(savedInstanceState);
       addPreferencesFromResource(R.xml.pref_general);
 
-      // Display the current project number as the preference summary
-      setSummaryToValue(findPreference(PREF_PROJECT_NUMBER));
+      // Display the current project id as the preference summary
+      setSummaryToValue(findPreference(PREF_PROJECT_ID));
 
       // The account preference opens up the account chooser dialog
       Preference accountNamePreference = findPreference(PREF_ACCOUNT_NAME);
@@ -111,8 +110,8 @@ public class SettingsActivity extends Activity {
         .putString(PREF_ACCOUNT_NAME, accountName).commit();
   }
 
-  public static String getProjectNumber(Context context) {
+  public static String getProjectId(Context context) {
     return PreferenceManager.getDefaultSharedPreferences(context)
-        .getString(PREF_PROJECT_NUMBER, null);
+        .getString(PREF_PROJECT_ID, null);
   }
 }
